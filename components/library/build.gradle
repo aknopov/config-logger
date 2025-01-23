@@ -1,6 +1,8 @@
 plugins {
     id 'java'
     id 'io.spring.dependency-management' version "${springDependencyManagement}"
+    id('net.ltgt.errorprone') version '4.1.0'
+    id('net.ltgt.nullaway') version '2.2.0'
 }
 
 group = 'com.aknopov.jsoncompare'
@@ -10,14 +12,20 @@ repositories {
     mavenCentral()
 }
 
+compileJava.options.encoding = 'UTF-8'
+compileTestJava.options.encoding = 'UTF-8'
+
 dependencyManagement {
     imports {
         mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
-//        mavenBom("org.springframework.boot:gradle.plugin.SpringBootPlugin.${springBootVersion}")
     }
 }
 
 dependencies {
+    errorprone("com.google.errorprone:error_prone_core:$errorproneVersion")
+    errorprone("com.uber.nullaway:nullaway:$nullawayVersion")
+    compileOnly "com.google.errorprone:error_prone_annotations:$errorproneVersion"
+
     implementation "jakarta.annotation:jakarta.annotation-api:${jakartaAnnotationVersion}"
 
     implementation "org.slf4j:slf4j-api:$slf4jVersion"
@@ -31,7 +39,11 @@ dependencies {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs.add("-parameters")
+    options.errorprone.disableWarningsInGeneratedCode.set(true)
+}
+
+nullaway {
+    annotatedPackages.add("com.aknopov")
 }
 
 test {

@@ -13,3 +13,8 @@ logging:
   level:
     # These values override "logback.xml"
     root: ${LOGBACK_ROOT_LEVEL:-INFO}
+
+config:
+  logging:
+    package: org.sample
+    prefix: "Service configuration"

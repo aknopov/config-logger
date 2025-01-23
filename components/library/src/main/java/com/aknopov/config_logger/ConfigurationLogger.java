@@ -46,7 +46,9 @@ public class ConfigurationLogger {
      * @param appPackage - a root package to scan for beans, e.g. "org.example"
      * @param lineHeading - a heading in the log entry for the settings output, e.g. "Service configuration"
      */
-    public ConfigurationLogger(@Value("org.sample") String appPackage, @Value("Service configuration") String lineHeading) {
+    public ConfigurationLogger(
+            @Value("${config.logging.package:}") String appPackage,
+            @Value("${config.logging.prefix:Service configuration}") String lineHeading) {
         this.appPackage = appPackage;
         this.lineHeading = lineHeading;
     }
@@ -103,7 +105,7 @@ public class ConfigurationLogger {
         // These are defaults
         String[] parts = raw.replace(SPEL_PFX, "")
                 .replace("}", "")
-                .split(":");
+                .split(":", -1);
         return Map.entry(parts[0], parts.length == 2 ? parts[1] : "N/A");
     }
 }

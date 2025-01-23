@@ -1,0 +1,19 @@
+management:
+  endpoint:
+    health:
+      show-details: always
+      status:
+        http-mapping:
+          down: 200
+  endpoints:
+    web:
+      base-path: /
+
+server:
+  port: 8080
+
+logging:
+  level:
+    # These values override "logback.xml"
+    root: INFO
+    org.example: INFO

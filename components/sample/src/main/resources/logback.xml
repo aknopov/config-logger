@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="10 seconds">
+    <include resource="org/springframework/boot/logging/logback/defaults.xml" />
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator"/>
+
+    <!--This pattern strips exception stack trace if present-->
+    <property name="LOG_BASE_NAME" value="springboot-example"/>
+
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d [%thread] %-5level logger="%logger{35}", msg="%msg"%n</pattern>
+        </encoder>
+    </appender>
+
+    <variable name="LOGBACK_ROOT_LEVEL" value="${LOGBACK_ROOT_LEVEL:-INFO}" />
+    <root level="${LOGBACK_ROOT_LEVEL}">
+        <appender-ref ref="consoleAppender"/>
+    </root>
+
+    <!-- Override some of the noisier loggers -->
+    <logger name="org.springframework.ws.soap.saaj.SaajSoapMessageFactory" level="WARN"/>
+    <!-- Logs to much in debug mode, this info is doubled -->
+    <logger name="org.apache.coyote.http11.Http11InputBuffer" level="OFF"/>
+
+</configuration>

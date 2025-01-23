@@ -31,21 +31,32 @@ import jakarta.annotation.PostConstruct;
  */
 @Component
 @Order(Ordered.LOWEST_PRECEDENCE)
-public class ConfigurationLogger
-{
+public class ConfigurationLogger {
     private static final Logger logger = LoggerFactory.getLogger(ConfigurationLogger.class);
+    private static final String SPEL_PFX = "${";
+
+    private final String appPackage;
+    private final String lineHeading;
     @Autowired
     private Environment environment;
 
     /**
-     * Logs configuration parameters in all application beans
+     * Constructor
      *
      * @param appPackage - a root package to scan for beans, e.g. "org.example"
      * @param lineHeading - a heading in the log entry for the settings output, e.g. "Service configuration"
      */
+    public ConfigurationLogger(@Value("org.sample") String appPackage, @Value("Service configuration") String lineHeading) {
+        this.appPackage = appPackage;
+        this.lineHeading = lineHeading;
+    }
+
+    /**
+     * Logs configuration parameters in all application beans
+     *
+     */
     @PostConstruct
-    public void logSettings(String appPackage, String lineHeading) throws ClassNotFoundException
-    {
+    public void logSettings() throws ClassNotFoundException {
         // https://stackoverflow.com/posts/21430849/revisions
         ClassPathScanningCandidateComponentProvider provider = new ClassPathScanningCandidateComponentProvider(false);
         provider.addIncludeFilter(new RegexPatternTypeFilter(Pattern.compile(".*")));
@@ -53,30 +64,26 @@ public class ConfigurationLogger
 
         Properties allSettings = new Properties();
 
-        for (var beanDef : beanDefs)
-        {
+        for (var beanDef : beanDefs) {
             Class<?> klaz = Class.forName(beanDef.getBeanClassName());
             allSettings.putAll(extractInjectedValues(klaz));
         }
 
         allSettings.entrySet()
                 .stream()
-                .map(e -> Map.entry(e.getKey().toString(), e.getValue()))
+                .map(e -> Map.entry(e.getKey()
+                        .toString(), e.getValue()))
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(e -> logger.info("{}: {} = {}", lineHeading, e.getKey(), e.getValue()));
     }
 
-    private Properties extractInjectedValues(Class<?> klaz)
-    {
+    private Properties extractInjectedValues(Class<?> klaz) {
         Properties ret = new Properties();
 
-        for (Constructor<?> ctor : klaz.getConstructors())
-        {
-            for (Parameter parm : ctor.getParameters())
-            {
+        for (Constructor<?> ctor : klaz.getConstructors()) {
+            for (Parameter parm : ctor.getParameters()) {
                 Value annotation = parm.getAnnotation(Value.class);
-                if (annotation != null)
-                {
+                if (annotation != null) {
                     Map.Entry<String, String> entry = parseAnnotation(annotation);
                     String envValue = environment.getProperty(entry.getKey());
                     String realValue = envValue != null ? envValue : entry.getValue();
@@ -88,11 +95,13 @@ public class ConfigurationLogger
         return ret;
     }
 
-    private Map.Entry<String, String> parseAnnotation(Value annotation)
-    {
-        String unparsed = annotation.value();
+    private Map.Entry<String, String> parseAnnotation(Value annotation) {
+        String raw = annotation.value();
+        if (!raw.startsWith(SPEL_PFX)) {
+            return Map.entry("<unkn>", raw);
+        }
         // These are defaults
-        String[] parts = unparsed.replace("${", "")
+        String[] parts = raw.replace(SPEL_PFX, "")
                 .replace("}", "")
                 .split(":");
         return Map.entry(parts[0], parts.length == 2 ? parts[1] : "N/A");

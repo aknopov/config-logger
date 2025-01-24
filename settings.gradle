@@ -2,5 +2,6 @@ rootProject.name = 'config-logger'
 
 include 'library'
 project(':library').projectDir = new File(rootDir, 'components/library')
+project(':library').name = 'config-logger'
 include 'sample'
 project(':sample').projectDir = new File(rootDir, 'components/sample')

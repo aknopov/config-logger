@@ -16,9 +16,11 @@ taken from Java properties, or environment variables.
     config.logging.package = com.example
     config.logging.prefix = "Whatever you like"
     ```
-1. Make SpringBoot to load the library bean. For example, with `@ComponentScan`:
+1. Make SpringBoot to load the library bean. For example:
 
     ```java
+    import com.aknopov.config_logger.ConfigurationLogger;
+   
     @SpringBootApplication
     @Import(ConfigurationLogger.class)
     public static void main(String[] args) {
@@ -35,4 +37,4 @@ taken from Java properties, or environment variables.
 ### Limitations
 1. The library supports only constructor parameters with `@Value` annotation.
 2. The library assumes that annotations have `${name:default}`, `${name}` or `constant` format. SpEL expressions are not supported.
-In the first two cases, if variable  is not set, the log contains "N/A" value. In the last case "<unkn>" is used as parameter name since it is undefined.
+In the first two cases, if variable  is not set, the log contains "N/A" value. In the last case "\<unkn\>" is used as parameter name since it is undefined.

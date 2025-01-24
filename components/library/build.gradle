@@ -5,8 +5,8 @@ plugins {
     id('net.ltgt.nullaway') version '2.2.0'
 }
 
-group = 'com.aknopov.jsoncompare'
-version = '0.0.1-SNAPSHOT'
+group = 'com.aknopov.config-logger'
+version = '0.0.2-SNAPSHOT'
 
 repositories {
     mavenCentral()

@@ -73,8 +73,7 @@ public class ConfigurationLogger {
 
         allSettings.entrySet()
                 .stream()
-                .map(e -> Map.entry(e.getKey()
-                        .toString(), e.getValue()))
+                .map(e -> Map.entry(e.getKey().toString(), e.getValue()))
                 .sorted(Map.Entry.comparingByKey())
                 .forEach(e -> logger.info("{}: {} = {}", lineHeading, e.getKey(), e.getValue()));
     }
